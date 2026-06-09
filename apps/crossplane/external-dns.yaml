@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-dns
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://kubernetes-sigs.github.io/external-dns/
+    chart: external-dns
+    targetRevision: 1.21.*
+    helm:
+      values: |
+        provider:
+          name: google
+        extraArgs:
+          - --google-project=andreas-494412
+          - --domain-filter=andreas.mcce.werschlan.at
+        serviceAccount:
+          create: true
+          name: external-dns
+        policy: upsert-only
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: external-dns
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
