@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/awerschlan/SS2026-INENP-GitOps
+    repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
     targetRevision: HEAD
     path: apps
     directory:

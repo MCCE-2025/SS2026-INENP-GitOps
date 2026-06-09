@@ -4,7 +4,7 @@ metadata:
   name: dns-test
   namespace: default
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: external-dns-test.andreas.mcce.werschlan.at
+    external-dns.alpha.kubernetes.io/hostname: external-dns-test.inenp.werschlan.at
 spec:
   type: LoadBalancer
   ports:

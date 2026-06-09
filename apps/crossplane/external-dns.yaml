@@ -14,8 +14,8 @@ spec:
         provider:
           name: google
         extraArgs:
-          - --google-project=andreas-494412
-          - --domain-filter=andreas.mcce.werschlan.at
+          - --google-project=sonorous-stone-498307-u2
+          - --domain-filter=inenp.werschlan.at
         serviceAccount:
           create: true
           name: external-dns
