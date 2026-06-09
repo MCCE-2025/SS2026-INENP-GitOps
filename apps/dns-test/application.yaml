@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dns-test
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/awerschlan/SS2026-INENP-GitOps
+    targetRevision: HEAD
+    path: apps/dns-test/manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
