@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
     targetRevision: HEAD
-    path: apps/dns-test/manifests
+    path: platform/external-dns/manifests
   destination:
     server: https://kubernetes.default.svc
     namespace: default
