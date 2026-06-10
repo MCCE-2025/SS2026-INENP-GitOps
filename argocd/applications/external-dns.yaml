@@ -14,7 +14,7 @@ spec:
         valueFiles:
           - $values/platform/external-dns/values.yaml
     - repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
-      targetRevision: feat/argocd-gitops-bootstrap
+      targetRevision: HEAD
       ref: values
 
   destination:
