@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
-    targetRevision: HEAD
+    targetRevision: feat/argocd-gitops-bootstrap
     path: platform/external-dns/manifests
   destination:
     server: https://kubernetes.default.svc

@@ -15,7 +15,7 @@ spec:
         valueFiles:
           - $values/platform/crossplane/values.yaml
     - repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
-      targetRevision: HEAD
+      targetRevision: feat/argocd-gitops-bootstrap
       ref: values
 
   destination:
