@@ -1,0 +1,9 @@
+provider:
+  name: google
+extraArgs:
+  - --google-project=sonorous-stone-498307-u2
+  - --domain-filter=inenp.werschlan.at
+serviceAccount:
+  create: true
+  name: external-dns
+policy: upsert-only
