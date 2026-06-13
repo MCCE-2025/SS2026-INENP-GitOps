@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: backend
+  namespace: argocd
+spec:
+  project: apps
+
+  sources:
+    - repoURL: https://github.com/MCCE-2025/SS2026-INENP-backend
+      targetRevision: HEAD
+      path: charts/weather-app-backend
+      helm:
+        releaseName: weather-app-backend
+        valueFiles:
+          - $values/apps/backend/values.yaml
+    - repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
+      targetRevision: HEAD
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: backend
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
