@@ -1,0 +1,12 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/mcce-2025/ss2026-inenp-backend
+  tag: "v1.2.0"
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
