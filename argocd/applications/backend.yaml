@@ -17,6 +17,9 @@ spec:
     - repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
       targetRevision: HEAD
       ref: values
+    - repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
+      targetRevision: HEAD
+      path: apps/backend/manifests
 
   destination:
     server: https://kubernetes.default.svc

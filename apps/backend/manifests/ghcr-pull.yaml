@@ -1,0 +1,59 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: github-app-pem
+  namespace: backend
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: gcp-secret-manager
+    kind: ClusterSecretStore
+  target:
+    name: github-app-pem
+    creationPolicy: Owner
+  data:
+    - secretKey: key
+      remoteRef:
+        key: argocd-github-app-private-key
+---
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: GithubAccessToken
+metadata:
+  name: ghcr-token
+  namespace: backend
+spec:
+  appID: "4017848"
+  installID: "139349992"
+  permissions:
+    packages: read
+  auth:
+    privateKey:
+      secretRef:
+        name: github-app-pem
+        key: key
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: ghcr-pull
+  namespace: backend
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  refreshInterval: 30m
+  target:
+    name: ghcr-pull
+    creationPolicy: Owner
+    template:
+      type: kubernetes.io/dockerconfigjson
+      engineVersion: v2
+      data:
+        .dockerconfigjson: '{"auths":{"ghcr.io":{"username":"x-access-token","password":"{{ .token }}","auth":"{{ printf "x-access-token:%s" .token | b64enc }}"}}}'
+  dataFrom:
+    - sourceRef:
+        generatorRef:
+          apiVersion: generators.external-secrets.io/v1alpha1
+          kind: GithubAccessToken
+          name: ghcr-token
