@@ -1,0 +1,20 @@
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  name: provider-gcp-artifact
+spec:
+  serviceAccountTemplate:
+    metadata:
+      # Fixed KSA name so the Workload Identity binding in the IaC repo is stable.
+      name: provider-gcp-artifact
+      annotations:
+        iam.gke.io/gcp-service-account: crossplane-gar@sonorous-stone-498307-u2.iam.gserviceaccount.com
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-gcp-artifact
+spec:
+  package: xpkg.upbound.io/upbound/provider-gcp-artifact:v2.5.4
+  runtimeConfigRef:
+    name: provider-gcp-artifact
