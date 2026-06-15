@@ -1,0 +1,13 @@
+apiVersion: artifact.gcp.upbound.io/v1beta1
+kind: RegistryRepository
+metadata:
+  name: weather-app-backend
+  annotations:
+    crossplane.io/external-name: weather-app-backend
+spec:
+  forProvider:
+    location: europe-west3
+    format: DOCKER
+    description: "Container images for the weather-app-backend service"
+  providerConfigRef:
+    name: default
