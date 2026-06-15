@@ -4,6 +4,10 @@ metadata:
   name: weather-app-backend
   annotations:
     crossplane.io/external-name: weather-app-backend
+    # Created last: needs the RegistryRepository CRD (from the Provider) and a
+    # working ProviderConfig (wave 1) before it can be reconciled.
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   forProvider:
     location: europe-west3
