@@ -2,6 +2,10 @@ apiVersion: pkg.crossplane.io/v1beta1
 kind: DeploymentRuntimeConfig
 metadata:
   name: provider-gcp-artifact
+  annotations:
+    # Apply the runtime config and Provider first; the Provider installs the
+    # gcp.upbound.io / artifact.gcp.upbound.io CRDs that later waves depend on.
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   serviceAccountTemplate:
     metadata:
@@ -14,6 +18,8 @@ apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
   name: provider-gcp-artifact
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   package: xpkg.upbound.io/upbound/provider-gcp-artifact:v2.5.4
   runtimeConfigRef:
