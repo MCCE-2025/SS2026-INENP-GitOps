@@ -1,0 +1,14 @@
+replicaCount: 1
+
+image:
+  repository: europe-west3-docker.pkg.dev/sonorous-stone-498307-u2/weather-app-frontend/weather-app-frontend
+  tag: "v1.2.0"
+
+service:
+  type: LoadBalancer
+  port: 80
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: weather.inenp.werschlan.at
+
+ingress:
+  enabled: false

@@ -1,0 +1,17 @@
+apiVersion: artifact.gcp.upbound.io/v1beta1
+kind: RegistryRepository
+metadata:
+  name: weather-app-frontend
+  annotations:
+    crossplane.io/external-name: weather-app-frontend
+    # Created last: needs the RegistryRepository CRD (from the Provider) and a
+    # working ProviderConfig (wave 1) before it can be reconciled.
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  forProvider:
+    location: europe-west3
+    format: DOCKER
+    description: "Container images for the weather-app-frontend service"
+  providerConfigRef:
+    name: default
