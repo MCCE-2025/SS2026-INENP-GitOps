@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager-config
+  namespace: argocd
+  annotations:
+    # Runs after the cert-manager controller and ingress-nginx are installed.
+    argocd.argoproj.io/sync-wave: "15"
+spec:
+  project: platform
+  source:
+    repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
+    targetRevision: HEAD
+    path: platform/cert-manager
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

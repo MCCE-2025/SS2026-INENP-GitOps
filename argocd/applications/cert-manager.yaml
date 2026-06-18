@@ -15,6 +15,12 @@ spec:
       values: |
         crds:
           enabled: true
+        # Workload Identity for the DNS-01 solver: the controller's KSA is
+        # annotated with the GCP service account that has roles/dns.admin
+        # (provisioned in the IaC repo).
+        serviceAccount:
+          annotations:
+            iam.gke.io/gcp-service-account: cert-manager-dns@sonorous-stone-498307-u2.iam.gserviceaccount.com
   destination:
     server: https://kubernetes.default.svc
     namespace: cert-manager
