@@ -3,6 +3,10 @@ kind: Application
 metadata:
   name: frontend
   namespace: argocd
+  annotations:
+    # Deploy after ClusterIssuer (wave 15) is ready, so cert-manager can issue
+    # TLS certificates on first sync instead of failing with a stale ACME order.
+    argocd.argoproj.io/sync-wave: "20"
 spec:
   project: apps
 
