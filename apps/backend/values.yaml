@@ -10,3 +10,23 @@ service:
 
 ingress:
   enabled: false
+
+# Spring Boot needs ~30s to start; default probes (delay=0) kill the pod before
+# Tomcat is listening on :8080, causing CrashLoopBackOff.
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: http
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: http
+  initialDelaySeconds: 35
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
