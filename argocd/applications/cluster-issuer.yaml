@@ -1,0 +1,20 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+  annotations:
+    # Applied after cert-manager (wave 10) is ready. Uses a DNS-01 solver via
+    # Google Cloud DNS, so it does not depend on ingress reachability and
+    # supports wildcard certificates.
+    argocd.argoproj.io/sync-wave: "15"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: platform@inenp.werschlan.at
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+    solvers:
+      - dns01:
+          cloudDNS:
+            project: sonorous-stone-498307-u2
