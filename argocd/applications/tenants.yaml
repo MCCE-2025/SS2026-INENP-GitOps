@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: tenants
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  generators:
+    # Discover one tenant per directory under tenants/. Adding a new folder
+    # (with a namespace.yaml and frontend-values.yaml) provisions a new tenant
+    # automatically — no need to hand-write an Application per tenant.
+    - git:
+        repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
+        revision: HEAD
+        directories:
+          - path: tenants/*
+  template:
+    metadata:
+      name: "tenant-{{ .path.basename }}"
+    spec:
+      project: apps
+      sources:
+        # Tenant-scoped raw manifests (namespace, ResourceQuota, ...).
+        - repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
+          targetRevision: HEAD
+          path: "{{ .path.path }}"
+          directory:
+            recurse: false
+            exclude: "*-values.yaml"
+        # Frontend deployed from its chart, using the tenant's values file.
+        - repoURL: https://github.com/MCCE-2025/SS2026-INENP-frontend
+          targetRevision: HEAD
+          path: charts/weather-app-frontend
+          helm:
+            releaseName: weather-app-frontend
+            valueFiles:
+              - "$values/{{ .path.path }}/frontend-values.yaml"
+        - repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
+          targetRevision: HEAD
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{ .path.basename }}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
