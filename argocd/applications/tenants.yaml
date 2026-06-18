@@ -19,6 +19,8 @@ spec:
   template:
     metadata:
       name: "tenant-{{ .path.basename }}"
+      annotations:
+        argocd.argoproj.io/sync-wave: "20"
     spec:
       project: apps
       sources:
