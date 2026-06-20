@@ -1,0 +1,30 @@
+apiVersion: sql.gcp.m.upbound.io/v1beta1
+kind: DatabaseInstance
+metadata:
+  name: weather-app-db
+  annotations:
+    crossplane.io/external-name: weather-app-db
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  forProvider:
+    databaseVersion: POSTGRES_15
+    region: europe-west3
+    deletionProtection: false
+    settings:
+      - tier: db-f1-micro
+        diskAutoresize: true
+        diskSize: 10
+        diskType: PD_SSD
+        ipConfiguration:
+          - ipv4Enabled: false
+            privateNetwork: projects/sonorous-stone-498307-u2/global/networks/platform-cluster-vpc
+        backupConfiguration:
+          - enabled: true
+            pointInTimeRecoveryEnabled: false
+            startTime: "03:00"
+  providerConfigRef:
+    name: default
+  writeConnectionSecretToRef:
+    name: weather-app-db-connection
+    namespace: crossplane-system

@@ -1,0 +1,18 @@
+apiVersion: sql.gcp.m.upbound.io/v1beta1
+kind: User
+metadata:
+  name: weather-app-user
+  annotations:
+    crossplane.io/external-name: weather_app
+    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  forProvider:
+    instanceRef:
+      name: weather-app-db
+    passwordSecretRef:
+      name: cloud-sql-app-password
+      key: password
+      namespace: crossplane-system
+  providerConfigRef:
+    name: default

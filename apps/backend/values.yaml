@@ -4,6 +4,15 @@ image:
   repository: europe-west3-docker.pkg.dev/sonorous-stone-498307-u2/weather-app-backend/weather-app-backend
   tag: "v1.3.1"
 
+serviceAccount:
+  annotations:
+    iam.gke.io/gcp-service-account: weather-app-backend@sonorous-stone-498307-u2.iam.gserviceaccount.com
+
+# Enable after releasing a backend image built with PostgreSQL support (v1.4.0+).
+database:
+  enabled: false
+  schema: public
+
 service:
   type: ClusterIP
   port: 8080

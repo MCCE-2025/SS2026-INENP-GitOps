@@ -1,0 +1,23 @@
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  name: provider-gcp-sql
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  serviceAccountTemplate:
+    metadata:
+      name: provider-gcp-sql
+      annotations:
+        iam.gke.io/gcp-service-account: crossplane-sql@sonorous-stone-498307-u2.iam.gserviceaccount.com
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-gcp-sql
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  package: xpkg.upbound.io/upbound/provider-gcp-sql:v2.5.4
+  runtimeConfigRef:
+    name: provider-gcp-sql
