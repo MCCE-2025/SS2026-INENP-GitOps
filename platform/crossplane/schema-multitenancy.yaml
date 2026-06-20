@@ -1,0 +1,24 @@
+# PostgreSQL schema convention for soft multitenancy on a single Cloud SQL database.
+#
+# One Crossplane-managed instance (weather-app-db) hosts one database (weather_app).
+# Each workload connects to the same database but uses its own PostgreSQL schema:
+#
+#   - Platform / shared backend (apps/backend): schema "public"
+#   - Tenant workloads: schema "tenant_<folder>" e.g. tenant-a -> tenant_a
+#
+# Schemas are created automatically by Flyway (spring.flyway.create-schemas=true)
+# when an app starts with DB_SCHEMA set in Helm values. Crossplane does not
+# manage individual schemas — only the instance, database, and SQL user.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: database-schema-convention
+  namespace: crossplane-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+data:
+  instance: weather-app-db
+  database: weather_app
+  defaultSchema: public
+  tenantSchemaPattern: "tenant_<tenant-folder-with-underscores>"
+  tenant-a-schema: tenant_a

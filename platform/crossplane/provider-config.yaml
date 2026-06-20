@@ -12,6 +12,6 @@ spec:
   projectID: sonorous-stone-498307-u2
   credentials:
     # Crossplane provider pods authenticate to GCP via GKE Workload Identity.
-    # The provider's Kubernetes ServiceAccount must be annotated with a GCP SA
-    # that has roles/artifactregistry.admin (configured in the IaC repo).
+    # provider-gcp-artifact KSA -> crossplane-gar@... (roles/artifactregistry.admin)
+    # provider-gcp-sql KSA      -> crossplane-sql@... (roles/cloudsql.admin)
     source: InjectedIdentity
