@@ -9,9 +9,12 @@ serviceAccount:
     iam.gke.io/gcp-service-account: weather-app-backend@sonorous-stone-498307-u2.iam.gserviceaccount.com
 
 # Enable after releasing a backend image built with PostgreSQL support (v1.4.0+).
+# Password comes from ESO-managed Secret cloud-sql-credentials (see external-secret.yaml).
 database:
   enabled: false
   schema: public
+  credentialsSecretName: cloud-sql-credentials
+  instanceConnectionName: sonorous-stone-498307-u2:europe-west3:weather-app-db
 
 service:
   type: ClusterIP

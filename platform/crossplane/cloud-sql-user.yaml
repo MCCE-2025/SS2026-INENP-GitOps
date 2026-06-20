@@ -11,7 +11,7 @@ spec:
     instanceRef:
       name: weather-app-db
     passwordSecretRef:
-      name: cloud-sql-app-password
+      name: cloud-sql-credentials
       key: password
       namespace: crossplane-system
   providerConfigRef:

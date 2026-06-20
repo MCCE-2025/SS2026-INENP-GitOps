@@ -7,6 +7,13 @@ spec:
   project: apps
 
   sources:
+    # ESO manifest for cloud-sql-credentials (sync-wave -1, before Helm).
+    - repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
+      targetRevision: HEAD
+      path: apps/backend
+      directory:
+        recurse: false
+        exclude: "values.yaml"
     - repoURL: https://github.com/MCCE-2025/SS2026-INENP-backend
       targetRevision: HEAD
       path: charts/weather-app-backend
