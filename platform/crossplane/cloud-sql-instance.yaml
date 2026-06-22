@@ -14,10 +14,20 @@ spec:
     region: europe-west3
     deletionProtection: false
     settings:
-      tier: db-f1-micro
+      # Dedicated tier (1 vCPU / 3.75 GB). Shared-core tiers (db-f1-micro,
+      # db-g1-small) do NOT support HA, and a bigger tier is what actually allows
+      # more real connections (RAM-bound), so it pairs with REGIONAL below.
+      tier: db-custom-1-3840
+      # High availability: a standby in another zone with automatic failover.
+      # Note: HA improves availability, it does NOT add connection capacity —
+      # the standby is passive. Connection limit comes from tier + max_connections.
+      availabilityType: REGIONAL
       diskAutoresize: true
       diskSize: 10
       diskType: PD_SSD
+      databaseFlags:
+        - name: max_connections
+          value: "100"
       # Public IP without authorized networks: not reachable from the internet.
       # Backend reaches the DB only through the Cloud SQL Auth Proxy sidecar.
       ipConfiguration:
