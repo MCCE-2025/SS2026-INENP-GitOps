@@ -2,7 +2,7 @@ replicaCount: 2
 
 image:
   repository: europe-west3-docker.pkg.dev/sonorous-stone-498307-u2/weather-app-backend/weather-app-backend
-  tag: "v1.3.1"
+  tag: "v1.4.0"
 
 serviceAccount:
   annotations:
@@ -11,7 +11,7 @@ serviceAccount:
 # Enable after releasing a backend image built with PostgreSQL support (v1.4.0+).
 # Password comes from ESO-managed Secret cloud-sql-credentials (see external-secret.yaml).
 database:
-  enabled: false
+  enabled: true
   schema: public
   credentialsSecretName: cloud-sql-credentials
   instanceConnectionName: sonorous-stone-498307-u2:europe-west3:weather-app-db
