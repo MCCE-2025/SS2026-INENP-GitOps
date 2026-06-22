@@ -31,4 +31,3 @@ spec:
     kind: ClusterProviderConfig
   writeConnectionSecretToRef:
     name: weather-app-db-connection
-    namespace: crossplane-system
