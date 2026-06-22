@@ -13,7 +13,6 @@ spec:
     passwordSecretRef:
       name: cloud-sql-credentials
       key: password
-      namespace: crossplane-system
   providerConfigRef:
     name: default
     kind: ClusterProviderConfig
