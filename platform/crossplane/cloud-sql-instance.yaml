@@ -5,7 +5,9 @@ metadata:
   annotations:
     crossplane.io/external-name: weather-app-db
     argocd.argoproj.io/sync-wave: "3"
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    # Replace=true forces a delete+recreate so Argo can recover from a previously
+    # applied invalid object (settings as array) that blocks plain apply/update.
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Replace=true
 spec:
   forProvider:
     databaseVersion: POSTGRES_15
@@ -26,7 +28,7 @@ spec:
         startTime: "03:00"
   providerConfigRef:
     name: default
-    kind: ProviderConfig
+    kind: ClusterProviderConfig
   writeConnectionSecretToRef:
     name: weather-app-db-connection
     namespace: crossplane-system
