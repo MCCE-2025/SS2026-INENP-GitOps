@@ -18,6 +18,11 @@ resources:
     cpu: 250m
     memory: 256Mi
 
+# Point the SPA at the in-cluster backend over the same host (/api), no rebuild.
+runtimeConfig:
+  enabled: true
+  backendApiUrl: /api
+
 ingress:
   enabled: true
   className: nginx
@@ -29,6 +34,12 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
+  # Route /api on this host to the tenant's backend Service.
+  extraPaths:
+    - path: /api
+      pathType: Prefix
+      serviceName: weather-app-backend
+      servicePort: 8080
   tls:
     - secretName: tenant-a-frontend-tls
       hosts:
