@@ -1,0 +1,6 @@
+# Centralized FRONTEND image version for ALL tenants.
+# Bumping this tag rolls the frontend out to every tenant that does not override
+# it (override = frontend-values.yaml with its own image.tag, e.g. staging).
+# Versioned independently from the backend (tenants/versions-backend.yaml).
+image:
+  tag: "v1.2.1"

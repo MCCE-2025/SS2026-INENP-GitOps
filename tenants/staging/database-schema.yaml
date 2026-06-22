@@ -1,0 +1,7 @@
+# Documents the PostgreSQL schema this tenant uses on the shared Cloud SQL instance.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: database-schema
+data:
+  schema: staging
