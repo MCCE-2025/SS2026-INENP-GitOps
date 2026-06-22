@@ -1,0 +1,15 @@
+# Namespaced GCP managed resources (sql.gcp.m.upbound.io) cannot reference the
+# legacy cluster-scoped ProviderConfig (gcp.upbound.io). They resolve provider
+# config via the gcp.m.upbound.io API group, so we add a ClusterProviderConfig
+# in that group for the SQL resources to reference.
+apiVersion: gcp.m.upbound.io/v1beta1
+kind: ClusterProviderConfig
+metadata:
+  name: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  projectID: sonorous-stone-498307-u2
+  credentials:
+    source: InjectedIdentity
