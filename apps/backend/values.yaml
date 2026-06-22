@@ -2,7 +2,7 @@ replicaCount: 2
 
 image:
   repository: europe-west3-docker.pkg.dev/sonorous-stone-498307-u2/weather-app-backend/weather-app-backend
-  tag: "v1.6.0"
+  tag: "v1.7.0"
 
 serviceAccount:
   annotations:
