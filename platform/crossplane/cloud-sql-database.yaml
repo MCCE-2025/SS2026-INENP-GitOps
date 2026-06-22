@@ -12,3 +12,4 @@ spec:
       name: weather-app-db
   providerConfigRef:
     name: default
+    kind: ProviderConfig

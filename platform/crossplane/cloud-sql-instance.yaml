@@ -16,15 +16,17 @@ spec:
         diskAutoresize: true
         diskSize: 10
         diskType: PD_SSD
+        # Public IP without authorized networks: not reachable from the internet.
+        # Backend reaches the DB only through the Cloud SQL Auth Proxy sidecar.
         ipConfiguration:
-          - ipv4Enabled: false
-            privateNetwork: projects/sonorous-stone-498307-u2/global/networks/platform-cluster-vpc
+          - ipv4Enabled: true
         backupConfiguration:
           - enabled: true
             pointInTimeRecoveryEnabled: false
             startTime: "03:00"
   providerConfigRef:
     name: default
+    kind: ProviderConfig
   writeConnectionSecretToRef:
     name: weather-app-db-connection
     namespace: crossplane-system
