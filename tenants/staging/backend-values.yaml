@@ -11,6 +11,12 @@ serviceAccount:
   annotations:
     iam.gke.io/gcp-service-account: weather-app-backend@sonorous-stone-498307-u2.iam.gserviceaccount.com
 
+# AVWX token from the ESO-synced api-keys Secret (see avwx-secret.yaml).
+apiKeys:
+  useExistingSecret: true
+  existingSecretName: api-keys
+  existingSecretKey: avwx-api-key
+
 database:
   enabled: true
   schema: staging
