@@ -9,8 +9,8 @@ spec:
     - missingkey=error
   generators:
     # Discover one tenant per directory under tenants/. Adding a new folder
-    # (with a namespace.yaml and frontend-values.yaml) provisions a new tenant
-    # automatically — no need to hand-write an Application per tenant.
+    # (with namespace.yaml, frontend-values.yaml, backend-values.yaml)
+    # provisions a new tenant automatically.
     - git:
         repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
         revision: HEAD
@@ -24,21 +24,36 @@ spec:
     spec:
       project: apps
       sources:
-        # Tenant-scoped raw manifests (namespace, ResourceQuota, ...).
+        # Tenant-scoped raw manifests (namespace, ResourceQuota, schema ConfigMap).
         - repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
           targetRevision: HEAD
           path: "{{ .path.path }}"
           directory:
             recurse: false
             exclude: "*-values.yaml"
-        # Frontend deployed from its chart, using the tenant's values file.
+        # Frontend chart. Image tag comes from the centralized
+        # tenants/versions-frontend.yaml, then the tenant's own frontend-values.yaml
+        # (host, resources). A tenant can override the version by setting image.tag
+        # in its frontend-values.yaml (e.g. staging) — listed last, so it wins.
         - repoURL: https://github.com/MCCE-2025/SS2026-INENP-frontend
           targetRevision: HEAD
           path: charts/weather-app-frontend
           helm:
             releaseName: weather-app-frontend
             valueFiles:
+              - "$values/tenants/versions-frontend.yaml"
               - "$values/{{ .path.path }}/frontend-values.yaml"
+        # Backend chart. Independent version from the frontend
+        # (tenants/versions-backend.yaml); backend-values.yaml sets the tenant's
+        # PostgreSQL schema (tenant_<name>) and may override image.tag (staging).
+        - repoURL: https://github.com/MCCE-2025/SS2026-INENP-backend
+          targetRevision: HEAD
+          path: charts/weather-app-backend
+          helm:
+            releaseName: weather-app-backend
+            valueFiles:
+              - "$values/tenants/versions-backend.yaml"
+              - "$values/{{ .path.path }}/backend-values.yaml"
         - repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
           targetRevision: HEAD
           ref: values

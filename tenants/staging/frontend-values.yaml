@@ -1,15 +1,16 @@
-replicaCount: 2
+replicaCount: 1
 
 image:
   repository: europe-west3-docker.pkg.dev/sonorous-stone-498307-u2/weather-app-frontend/weather-app-frontend
-  # tag comes from tenants/versions.yaml (centralized)
+  # SPECIAL TENANT: staging pins its OWN frontend version here, independent of
+  # the centralized tenants/versions.yaml. Because this file is listed AFTER
+  # versions.yaml in the ApplicationSet, this tag wins.
+  tag: "v1.2.1"
 
 service:
   type: ClusterIP
   port: 80
 
-# Required: the tenant ResourceQuota enforces limits, so every pod must declare
-# resource requests and limits or the namespace will reject it.
 resources:
   requests:
     cpu: 50m
@@ -23,13 +24,13 @@ ingress:
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    external-dns.alpha.kubernetes.io/hostname: tenant-a.inenp.werschlan.at
+    external-dns.alpha.kubernetes.io/hostname: staging.inenp.werschlan.at
   hosts:
-    - host: tenant-a.inenp.werschlan.at
+    - host: staging.inenp.werschlan.at
       paths:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: tenant-a-frontend-tls
+    - secretName: staging-frontend-tls
       hosts:
-        - tenant-a.inenp.werschlan.at
+        - staging.inenp.werschlan.at

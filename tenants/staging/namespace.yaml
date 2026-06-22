@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging
+  labels:
+    tenant: staging
+    environment: staging
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: staging-quota
+  namespace: staging
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    limits.cpu: "4"
+    limits.memory: 8Gi

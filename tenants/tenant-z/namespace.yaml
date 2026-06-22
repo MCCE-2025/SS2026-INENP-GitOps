@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tenant-z
+  labels:
+    tenant: tenant-z
+    environment: dev
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: tenant-z-quota
+  namespace: tenant-z
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    limits.cpu: "4"
+    limits.memory: 8Gi

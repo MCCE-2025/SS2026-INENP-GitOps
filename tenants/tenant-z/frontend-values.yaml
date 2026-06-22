@@ -8,8 +8,6 @@ service:
   type: ClusterIP
   port: 80
 
-# Required: the tenant ResourceQuota enforces limits, so every pod must declare
-# resource requests and limits or the namespace will reject it.
 resources:
   requests:
     cpu: 50m
@@ -23,13 +21,13 @@ ingress:
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    external-dns.alpha.kubernetes.io/hostname: tenant-a.inenp.werschlan.at
+    external-dns.alpha.kubernetes.io/hostname: tenant-z.inenp.werschlan.at
   hosts:
-    - host: tenant-a.inenp.werschlan.at
+    - host: tenant-z.inenp.werschlan.at
       paths:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: tenant-a-frontend-tls
+    - secretName: tenant-z-frontend-tls
       hosts:
-        - tenant-a.inenp.werschlan.at
+        - tenant-z.inenp.werschlan.at

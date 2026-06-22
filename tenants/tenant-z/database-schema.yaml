@@ -1,0 +1,8 @@
+# Documents the PostgreSQL schema this tenant uses on the shared Cloud SQL instance.
+# See platform/crossplane/schema-multitenancy.yaml for the full convention.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: database-schema
+data:
+  schema: tenant_z
