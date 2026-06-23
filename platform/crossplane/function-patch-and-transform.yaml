@@ -1,0 +1,11 @@
+# Crossplane v2 Compositions run in Pipeline mode and need a composition function
+# to render resources. function-patch-and-transform provides the classic
+# resources/patches model used by the frontend-hosting Composition.
+apiVersion: pkg.crossplane.io/v1
+kind: Function
+metadata:
+  name: function-patch-and-transform
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform:v0.9.0

@@ -3,6 +3,9 @@
 # read, and object-admin for the CI service account. The bucket's public URL is
 # patched back to status.url of the composite (the value we "store" per the
 # assignment).
+#
+# Crossplane v2 runs Compositions in Pipeline mode, so the classic
+# resources/patches model is supplied as input to function-patch-and-transform.
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
@@ -13,81 +16,88 @@ spec:
   compositeTypeRef:
     apiVersion: platform.inenp.werschlan.at/v1alpha1
     kind: XFrontendHosting
-  writeConnectionSecretsToNamespace: crossplane-system
-  resources:
-    # The static-hosting bucket.
-    - name: bucket
-      base:
-        apiVersion: storage.gcp.upbound.io/v1beta1
-        kind: Bucket
-        spec:
-          forProvider:
-            location: EU
-            uniformBucketLevelAccess: true
-            forceDestroy: true
-            website:
-              - mainPageSuffix: index.html
-                notFoundPage: index.html
-          providerConfigRef:
-            name: default
-      patches:
-        - fromFieldPath: spec.parameters.bucketName
-          toFieldPath: metadata.annotations[crossplane.io/external-name]
-        # Deterministic MR name so the IAM members can reference this bucket.
-        - fromFieldPath: spec.parameters.bucketName
-          toFieldPath: metadata.name
-        - fromFieldPath: spec.parameters.location
-          toFieldPath: spec.forProvider.location
-        # Publish the public HTTP URL of the bucket website into the composite
-        # status. This is the URL stored in the custom component.
-        - type: CombineFromComposite
-          combine:
-            variables:
+  mode: Pipeline
+  pipeline:
+    - step: patch-and-transform
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          # The static-hosting bucket.
+          - name: bucket
+            base:
+              apiVersion: storage.gcp.upbound.io/v1beta1
+              kind: Bucket
+              spec:
+                forProvider:
+                  location: EU
+                  uniformBucketLevelAccess: true
+                  forceDestroy: true
+                  website:
+                    - mainPageSuffix: index.html
+                      notFoundPage: index.html
+                providerConfigRef:
+                  name: default
+            patches:
               - fromFieldPath: spec.parameters.bucketName
-            strategy: string
-            string:
-              fmt: "http://%s.storage.googleapis.com/index.html"
-          toFieldPath: status.url
-          policy:
-            fromFieldPath: Required
+                toFieldPath: metadata.annotations[crossplane.io/external-name]
+              # Deterministic MR name so the IAM members can reference this bucket.
+              - fromFieldPath: spec.parameters.bucketName
+                toFieldPath: metadata.name
+              - fromFieldPath: spec.parameters.location
+                toFieldPath: spec.forProvider.location
+              # Publish the public HTTP URL of the bucket website into the
+              # composite status. This is the URL stored in the custom component.
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: spec.parameters.bucketName
+                  strategy: string
+                  string:
+                    fmt: "http://%s.storage.googleapis.com/index.html"
+                toFieldPath: status.url
+                policy:
+                  fromFieldPath: Required
 
-    # Public read so browsers can fetch the SPA.
-    - name: bucket-public-read
-      base:
-        apiVersion: storage.gcp.upbound.io/v1beta1
-        kind: BucketIAMMember
-        spec:
-          forProvider:
-            role: roles/storage.objectViewer
-            member: allUsers
-            bucketRef:
-              name: "" # set by patch
-          providerConfigRef:
-            name: default
-      patches:
-        - fromFieldPath: spec.parameters.bucketName
-          toFieldPath: spec.forProvider.bucketRef.name
+          # Public read so browsers can fetch the SPA.
+          - name: bucket-public-read
+            base:
+              apiVersion: storage.gcp.upbound.io/v1beta1
+              kind: BucketIAMMember
+              spec:
+                forProvider:
+                  role: roles/storage.objectViewer
+                  member: allUsers
+                  bucketRef:
+                    name: "" # set by patch
+                providerConfigRef:
+                  name: default
+            patches:
+              - fromFieldPath: spec.parameters.bucketName
+                toFieldPath: spec.forProvider.bucketRef.name
 
-    # CI service account can upload/sync/delete objects (keyless via WIF).
-    - name: bucket-ci-writer
-      base:
-        apiVersion: storage.gcp.upbound.io/v1beta1
-        kind: BucketIAMMember
-        spec:
-          forProvider:
-            role: roles/storage.objectAdmin
-            bucketRef:
-              name: "" # set by patch
-          providerConfigRef:
-            name: default
-      patches:
-        - fromFieldPath: spec.parameters.bucketName
-          toFieldPath: spec.forProvider.bucketRef.name
-        - type: CombineFromComposite
-          combine:
-            variables:
-              - fromFieldPath: spec.parameters.ciServiceAccount
-            strategy: string
-            string:
-              fmt: "serviceAccount:%s"
-          toFieldPath: spec.forProvider.member
+          # CI service account can upload/sync/delete objects (keyless via WIF).
+          - name: bucket-ci-writer
+            base:
+              apiVersion: storage.gcp.upbound.io/v1beta1
+              kind: BucketIAMMember
+              spec:
+                forProvider:
+                  role: roles/storage.objectAdmin
+                  bucketRef:
+                    name: "" # set by patch
+                providerConfigRef:
+                  name: default
+            patches:
+              - fromFieldPath: spec.parameters.bucketName
+                toFieldPath: spec.forProvider.bucketRef.name
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: spec.parameters.ciServiceAccount
+                  strategy: string
+                  string:
+                    fmt: "serviceAccount:%s"
+                toFieldPath: spec.forProvider.member
