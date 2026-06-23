@@ -13,9 +13,11 @@ spec:
   forProvider:
     databaseVersion: POSTGRES_15
     region: europe-west3
-    # Guard against accidental delete+recreate (e.g. during a major upgrade).
+    # Terraform/Crossplane-level: blocks provider destroy (e.g. Argo prune).
     deletionProtection: true
     settings:
+      # GCP API-level: visible in Cloud Console and blocks delete via API/gcloud.
+      deletionProtectionEnabled: true
       # Dedicated tier (1 vCPU / 3.75 GB). Shared-core tiers (db-f1-micro,
       # db-g1-small) do NOT support HA, and a bigger tier is what actually allows
       # more real connections (RAM-bound), so it pairs with REGIONAL below.
