@@ -102,3 +102,29 @@ spec:
                   string:
                     fmt: "serviceAccount:%s"
                 toFieldPath: spec.forProvider.member
+
+          # objectAdmin covers objects but NOT storage.buckets.get, which
+          # `gcloud storage rsync` calls to read bucket metadata first. Grant the
+          # CI SA legacyBucketReader (includes buckets.get) so rsync works.
+          - name: bucket-ci-bucket-reader
+            base:
+              apiVersion: storage.gcp.upbound.io/v1beta1
+              kind: BucketIAMMember
+              spec:
+                forProvider:
+                  role: roles/storage.legacyBucketReader
+                  bucketSelector:
+                    matchControllerRef: true
+                providerConfigRef:
+                  name: default
+            patches:
+              - fromFieldPath: spec.parameters.bucketName
+                toFieldPath: spec.forProvider.bucketSelector.matchLabels[frontend-hosting/bucket]
+              - type: CombineFromComposite
+                combine:
+                  variables:
+                    - fromFieldPath: spec.parameters.ciServiceAccount
+                  strategy: string
+                  string:
+                    fmt: "serviceAccount:%s"
+                toFieldPath: spec.forProvider.member
