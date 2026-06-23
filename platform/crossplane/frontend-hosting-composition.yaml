@@ -49,8 +49,9 @@ spec:
               - fromFieldPath: spec.parameters.location
                 toFieldPath: spec.forProvider.location
               # Publish the public HTTP URL of the bucket website into the
-              # composite status. This is the URL stored in the custom component.
-              - type: CombineFromComposite
+              # COMPOSITE status (ToComposite, not onto the Bucket which has no
+              # status.url field). This is the URL stored in the custom component.
+              - type: CombineToComposite
                 combine:
                   variables:
                     - fromFieldPath: spec.parameters.bucketName
