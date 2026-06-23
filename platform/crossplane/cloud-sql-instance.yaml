@@ -5,14 +5,16 @@ metadata:
   annotations:
     crossplane.io/external-name: weather-app-db
     argocd.argoproj.io/sync-wave: "3"
-    # Replace=true forces a delete+recreate so Argo can recover from a previously
-    # applied invalid object (settings as array) that blocks plain apply/update.
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true,Replace=true
+    # In-place updates only. Never delete+recreate the instance, otherwise a
+    # databaseVersion bump (major upgrade) would destroy the database instead
+    # of upgrading it.
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   forProvider:
     databaseVersion: POSTGRES_15
     region: europe-west3
-    deletionProtection: false
+    # Guard against accidental delete+recreate (e.g. during a major upgrade).
+    deletionProtection: true
     settings:
       # Dedicated tier (1 vCPU / 3.75 GB). Shared-core tiers (db-f1-micro,
       # db-g1-small) do NOT support HA, and a bigger tier is what actually allows
@@ -22,6 +24,13 @@ spec:
       # Note: HA improves availability, it does NOT add connection capacity —
       # the standby is passive. Connection limit comes from tier + max_connections.
       availabilityType: REGIONAL
+      # Controlled window for automatic minor/maintenance (patch) upgrades so
+      # they land predictably instead of at an arbitrary time. Sunday 03:00,
+      # stable update track (lags behind the latest by a few weeks).
+      maintenanceWindow:
+        day: 7
+        hour: 3
+        updateTrack: stable
       diskAutoresize: true
       diskSize: 10
       diskType: PD_SSD
@@ -34,7 +43,9 @@ spec:
         ipv4Enabled: true
       backupConfiguration:
         enabled: true
-        pointInTimeRecoveryEnabled: false
+        # PITR gives a rollback/recovery path for risky changes like a major
+        # version upgrade.
+        pointInTimeRecoveryEnabled: true
         startTime: "03:00"
   providerConfigRef:
     name: default
