@@ -1,0 +1,18 @@
+# The actual frontend hosting instance (custom component). Crossplane provisions
+# the GCS bucket from this and writes the public URL to status.url. Inspect it:
+#   kubectl get xfrontendhosting weather-frontend -o jsonpath='{.status.url}'
+#
+# bucketName matches the frontend public host in apps/frontend/values.yaml and is
+# the same bucket the CI job (release.yml) rsyncs the SPA into.
+apiVersion: platform.inenp.werschlan.at/v1alpha1
+kind: XFrontendHosting
+metadata:
+  name: weather-frontend
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  parameters:
+    bucketName: weather.inenp.werschlan.at
+    location: EU
+    ciServiceAccount: ci-image-push@sonorous-stone-498307-u2.iam.gserviceaccount.com
