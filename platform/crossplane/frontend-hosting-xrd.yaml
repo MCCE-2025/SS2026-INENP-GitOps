@@ -1,0 +1,54 @@
+# Custom component: a single high-level API for "static frontend hosting on a
+# GCS bucket". A claim of this kind provisions the bucket (website hosting,
+# public read, CI write access) and publishes the resulting public URL back into
+# the resource's status — which is the value the assignment asks us to store.
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xfrontendhostings.platform.inenp.werschlan.at
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  group: platform.inenp.werschlan.at
+  names:
+    kind: XFrontendHosting
+    plural: xfrontendhostings
+  claimNames:
+    kind: FrontendHosting
+    plural: frontendhostings
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                parameters:
+                  type: object
+                  properties:
+                    bucketName:
+                      type: string
+                      description: GCS bucket name; also the public host of the SPA.
+                    location:
+                      type: string
+                      description: Bucket location.
+                      default: EU
+                    ciServiceAccount:
+                      type: string
+                      description: Email of the CI service account allowed to write objects.
+                  required:
+                    - bucketName
+                    - ciServiceAccount
+              required:
+                - parameters
+            status:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: Public HTTP URL of the hosted SPA.
+              x-kubernetes-preserve-unknown-fields: true

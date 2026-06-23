@@ -1,0 +1,26 @@
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  name: provider-gcp-storage
+  annotations:
+    # Apply the runtime config and Provider first; the Provider installs the
+    # storage.gcp.upbound.io CRDs that the Composition depends on.
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  serviceAccountTemplate:
+    metadata:
+      # Fixed KSA name so the Workload Identity binding in the IaC repo is stable.
+      name: provider-gcp-storage
+      annotations:
+        iam.gke.io/gcp-service-account: crossplane-storage@sonorous-stone-498307-u2.iam.gserviceaccount.com
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-gcp-storage
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  package: xpkg.upbound.io/upbound/provider-gcp-storage:v2.5.4
+  runtimeConfigRef:
+    name: provider-gcp-storage
