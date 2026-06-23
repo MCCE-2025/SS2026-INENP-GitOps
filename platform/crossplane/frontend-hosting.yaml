@@ -2,10 +2,12 @@
 # the GCS bucket from this and writes the public URL to status.url. Inspect it:
 #   kubectl get xfrontendhosting weather-frontend -o jsonpath='{.status.url}'
 #
-# bucketName is the bucket's own public host. It must NOT reuse the cluster
-# frontend host (apps/frontend/values.yaml -> weather.inenp.werschlan.at), which
-# ExternalDNS points at the nginx ingress LB. The bucket gets its own DNS so the
-# two don't collide. This is the same bucket the CI job (release.yml) rsyncs into.
+# bucketName is a plain (non-domain) name on purpose: GCS requires Search Console
+# domain-ownership verification for buckets named like a DNS domain. Since the SPA
+# is served over the storage.googleapis.com URL (not a custom domain), a plain
+# name avoids that verification and works immediately. Globally unique via the
+# project id. This is the same bucket the CI job (release.yml) rsyncs into; the
+# public URL is published to status.url (the value stored in the custom component).
 apiVersion: platform.inenp.werschlan.at/v1alpha1
 kind: XFrontendHosting
 metadata:
@@ -15,6 +17,6 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   parameters:
-    bucketName: static.inenp.werschlan.at
+    bucketName: weather-frontend-spa-sonorous-stone-498307-u2
     location: EU
     ciServiceAccount: ci-image-push@sonorous-stone-498307-u2.iam.gserviceaccount.com
