@@ -224,3 +224,7 @@ argocd/applications/cert-manager.yaml
 argocd/applications/backend.yaml
 argocd/applications/frontend.yaml
 ```
+
+## Documentation
+
+- **Neuen Tenant anlegen:** [docs/adding-a-tenant.md](docs/adding-a-tenant.md)
