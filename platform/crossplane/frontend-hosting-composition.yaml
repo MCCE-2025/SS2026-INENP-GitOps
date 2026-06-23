@@ -43,9 +43,10 @@ spec:
             patches:
               - fromFieldPath: spec.parameters.bucketName
                 toFieldPath: metadata.annotations[crossplane.io/external-name]
-              # Deterministic MR name so the IAM members can reference this bucket.
+              # Label the bucket so the IAM members can find it via a selector,
+              # independent of the (immutable) MR name.
               - fromFieldPath: spec.parameters.bucketName
-                toFieldPath: metadata.name
+                toFieldPath: metadata.labels[frontend-hosting/bucket]
               - fromFieldPath: spec.parameters.location
                 toFieldPath: spec.forProvider.location
               # Publish the public HTTP URL of the bucket website into the
@@ -71,13 +72,13 @@ spec:
                 forProvider:
                   role: roles/storage.objectViewer
                   member: allUsers
-                  bucketRef:
-                    name: "" # set by patch
+                  bucketSelector:
+                    matchControllerRef: true
                 providerConfigRef:
                   name: default
             patches:
               - fromFieldPath: spec.parameters.bucketName
-                toFieldPath: spec.forProvider.bucketRef.name
+                toFieldPath: spec.forProvider.bucketSelector.matchLabels[frontend-hosting/bucket]
 
           # CI service account can upload/sync/delete objects (keyless via WIF).
           - name: bucket-ci-writer
@@ -87,13 +88,13 @@ spec:
               spec:
                 forProvider:
                   role: roles/storage.objectAdmin
-                  bucketRef:
-                    name: "" # set by patch
+                  bucketSelector:
+                    matchControllerRef: true
                 providerConfigRef:
                   name: default
             patches:
               - fromFieldPath: spec.parameters.bucketName
-                toFieldPath: spec.forProvider.bucketRef.name
+                toFieldPath: spec.forProvider.bucketSelector.matchLabels[frontend-hosting/bucket]
               - type: CombineFromComposite
                 combine:
                   variables:
