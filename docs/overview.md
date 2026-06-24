@@ -9,7 +9,7 @@ GitOps repository for the INENP Weather App platform (WS2026). It defines what A
 | Area | Details |
 |---|---|
 | **Scope** | Argo CD Applications, ApplicationSet-based tenants, platform component configuration, shared app values, tenant app values, Crossplane resources |
-| **Stack** | Argo CD, Helm, Crossplane, External Secrets Operator, cert-manager, ExternalDNS, ingress-nginx, Kyverno, Kargo, Dynatrace, OpenBao |
+| **Stack** | Argo CD, Helm, Crossplane, External Secrets Operator, cert-manager, ExternalDNS, ingress-nginx, Kyverno, Kargo, Dynatrace |
 | **Status** | Active - Terraform bootstraps the base platform, then Argo CD continuously reconciles this repository |
 
 ## Repository Structure
@@ -36,7 +36,6 @@ GitOps repository for the INENP Weather App platform (WS2026). It defines what A
 |       |-- kargo.yaml
 |       |-- kyverno.yaml
 |       |-- kyverno-policies.yaml
-|       |-- openbao.yaml
 |       |-- platform-ingress.yaml
 |       `-- tenants.yaml
 |-- platform/

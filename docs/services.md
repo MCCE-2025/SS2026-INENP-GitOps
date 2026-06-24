@@ -27,7 +27,6 @@ This document defines the services managed through the GitOps repository and exp
 | Kargo | `argocd/applications/kargo.yaml` | `kargo` | Promotion tool installed with a public UI/API at `kargo.inenp.werschlan.at`. Secrets come from GCP Secret Manager via ESO. |
 | Dynatrace Operator | `argocd/applications/dynatrace-operator.yaml` | `dynatrace` | Installs the Dynatrace Operator. Tokens are not stored in Git. |
 | Dynatrace config | `argocd/applications/dynatrace-config.yaml` | `dynatrace` | Applies the DynaKube custom resource after the operator and CRDs are ready. |
-| OpenBao | `argocd/applications/openbao.yaml` | `openbao` | Open-source Vault fork for secret management experiments/additive platform capability. Uses GCP KMS auto-unseal. |
 | Platform ingress | `argocd/applications/platform-ingress.yaml` | `argocd` | Applies stable HTTPS ingress resources for platform UIs such as Argo CD. |
 | DNS test | `argocd/applications/dns-test.yaml` | `default` | Small ExternalDNS validation manifest for testing DNS automation. |
 
