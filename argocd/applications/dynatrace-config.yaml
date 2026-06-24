@@ -1,0 +1,35 @@
+# Applies the DynaKube CR. Kept SEPARATE from the operator install so ordering is
+# explicit: the operator (dynatrace-operator app, default sync-wave 0) installs the
+# DynaKube CRD first; this app (later sync-wave) applies the CR. The retry +
+# SkipDryRunOnMissingResource handles the brief window before the CRD exists.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dynatrace-config
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  project: platform
+  source:
+    repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
+    targetRevision: HEAD
+    path: platform/dynatrace
+    directory:
+      recurse: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dynatrace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 30s
+        factor: 2
+        maxDuration: 5m
