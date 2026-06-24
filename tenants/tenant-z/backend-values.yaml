@@ -14,12 +14,11 @@ apiKeys:
   existingSecretName: api-keys
   existingSecretKey: avwx-api-key
 
-# Dedicated DB user (Crossplane, db-user.yaml) with a Crossplane-generated
-# password in cloud-sql-credentials; isolated to this tenant's schema.
+# Shared weather_app user (default); isolation is by schema. Password comes from
+# the ESO-synced cloud-sql-credentials Secret (see external-secret.yaml).
 database:
   enabled: true
   schema: tenant_z
-  username: tenant_z
   credentialsSecretName: cloud-sql-credentials
   instanceConnectionName: sonorous-stone-498307-u2:europe-west3:weather-app-db
 

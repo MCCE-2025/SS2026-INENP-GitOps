@@ -5,7 +5,7 @@ image:
   # SPECIAL TENANT: staging pins its OWN backend version here, independent of the
   # centralized tenants/versions.yaml. Listed AFTER versions.yaml, so this wins.
   # Use this tenant to test a new backend image before promoting it centrally.
-  tag: "v1.9.0"
+  tag: "v1.10.0"
 
 serviceAccount:
   annotations:
@@ -17,12 +17,11 @@ apiKeys:
   existingSecretName: api-keys
   existingSecretKey: avwx-api-key
 
-# Dedicated DB user (Crossplane, db-user.yaml) with a Crossplane-generated
-# password in cloud-sql-credentials; isolated to this tenant's schema.
+# Shared weather_app user (default); isolation is by schema. Password comes from
+# the ESO-synced cloud-sql-credentials Secret (see external-secret.yaml).
 database:
   enabled: true
   schema: staging
-  username: staging
   credentialsSecretName: cloud-sql-credentials
   instanceConnectionName: sonorous-stone-498307-u2:europe-west3:weather-app-db
 
