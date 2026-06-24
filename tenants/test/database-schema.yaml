@@ -1,8 +1,0 @@
-# Documents the PostgreSQL schema this tenant uses when the backend starts.
-# Flyway creates the schema automatically (spring.flyway.create-schemas=true).
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: database-schema
-data:
-  schema: test
