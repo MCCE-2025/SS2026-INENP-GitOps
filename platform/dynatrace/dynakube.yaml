@@ -16,7 +16,17 @@ spec:
   apiUrl: https://iga77291.live.dynatrace.com/api
   tokens: dynakube
   oneAgent:
-    cloudNativeFullStack: {}
+    cloudNativeFullStack:
+      # Small CPU/memory requests so the OneAgent DaemonSet pod fits on
+      # CPU-request-saturated nodes (nodes were ~98% reserved by requests, even
+      # though actual usage is low). Limits keep a safe ceiling.
+      oneAgentResources:
+        requests:
+          cpu: 50m
+          memory: 256Mi
+        limits:
+          cpu: 300m
+          memory: 512Mi
   activeGate:
     capabilities:
       - routing
