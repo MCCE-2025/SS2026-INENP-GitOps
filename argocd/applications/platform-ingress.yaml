@@ -1,0 +1,25 @@
+# Applies the platform UI Ingresses (Argo CD, etc.) so the management UIs are
+# reachable over stable HTTPS links instead of `kubectl port-forward`.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-ingress
+  namespace: argocd
+  annotations:
+    # After ingress-nginx and cert-manager are up.
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  project: platform
+  source:
+    repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
+    targetRevision: HEAD
+    path: platform/ingress
+    directory:
+      recurse: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
