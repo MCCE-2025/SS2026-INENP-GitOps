@@ -1,0 +1,73 @@
+# Disallow the mutable ":latest" image tag (and missing tags, which imply latest).
+# Audit only — reports violations, never blocks a deploy.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest-tag
+  annotations:
+    policies.kyverno.io/title: Disallow Latest Tag
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Images should use a fixed, immutable tag (or digest) so deploys are
+      reproducible. ":latest" or an untagged image is non-deterministic.
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+    - name: require-image-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - argocd
+                - crossplane-system
+                - kyverno
+                - cert-manager
+                - ingress-nginx
+                - external-dns
+                - external-secrets
+                - kargo
+                - openbao
+      validate:
+        message: "An image tag is required (a digest is also fine)."
+        pattern:
+          spec:
+            containers:
+              - image: "*:*"
+    - name: validate-image-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - argocd
+                - crossplane-system
+                - kyverno
+                - cert-manager
+                - ingress-nginx
+                - external-dns
+                - external-secrets
+                - kargo
+                - openbao
+      validate:
+        message: "Using the ':latest' tag is not allowed; pin a specific version."
+        pattern:
+          spec:
+            containers:
+              - image: "!*:latest"

@@ -1,0 +1,79 @@
+# Disallow privileged containers and hostPath volumes.
+# Audit only — reports violations, never blocks a deploy.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-privileged
+  annotations:
+    policies.kyverno.io/title: Disallow Privileged Containers and hostPath
+    policies.kyverno.io/category: Pod Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Privileged containers and hostPath mounts break container isolation and can
+      compromise the node. Workloads should run unprivileged with no host mounts.
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+    - name: no-privileged-containers
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - argocd
+                - crossplane-system
+                - kyverno
+                - cert-manager
+                - ingress-nginx
+                - external-dns
+                - external-secrets
+                - kargo
+                - openbao
+      validate:
+        message: "Privileged containers are not allowed (securityContext.privileged must not be true)."
+        foreach:
+          - list: request.object.spec.containers
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.securityContext.privileged || false }}"
+                    operator: Equals
+                    value: true
+    - name: no-host-path
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - argocd
+                - crossplane-system
+                - kyverno
+                - cert-manager
+                - ingress-nginx
+                - external-dns
+                - external-secrets
+                - kargo
+                - openbao
+      validate:
+        message: "hostPath volumes are not allowed."
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.object.spec.volumes[?hostPath] | length(@) || `0` }}"
+                operator: GreaterThan
+                value: 0
