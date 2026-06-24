@@ -4,6 +4,42 @@ This repository contains GitOps configuration for platform components, applicati
 
 The structure separates Argo CD control manifests from the actual configuration that is deployed.
 
+## Access URLs
+
+Everything is served over HTTPS through the shared `ingress-nginx` entrypoint.
+DNS records are created automatically by ExternalDNS and TLS certificates by
+cert-manager (`letsencrypt-prod`). All hosts live under the `inenp.werschlan.at`
+domain.
+
+### Management UIs
+
+These are reachable directly via a stable link (no `kubectl port-forward` needed).
+Both are protected by their built-in login.
+
+| Service  | URL                                  | Credentials |
+|----------|--------------------------------------|-------------|
+| Argo CD  | https://argocd.inenp.werschlan.at    | user `admin`; password: `kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' \| base64 -d` |
+| Kargo    | https://kargo.inenp.werschlan.at     | user `admin`; password: `terraform output -raw kargo_admin_password` (from the IaC repo) |
+
+### Application frontends (per tenant)
+
+| Tenant   | URL                                  |
+|----------|--------------------------------------|
+| default  | https://weather.inenp.werschlan.at   |
+| tenant-a | https://tenant-a.inenp.werschlan.at  |
+| tenant-z | https://tenant-z.inenp.werschlan.at  |
+| staging  | https://staging.inenp.werschlan.at   |
+
+Each tenant frontend routes `/api` to its own backend within the same namespace.
+A new tenant gets `https://<tenant>.inenp.werschlan.at` automatically by copying a
+tenant folder under `tenants/` and changing its name.
+
+### Shared ingress entrypoint
+
+| Component     | URL                                |
+|---------------|------------------------------------|
+| ingress-nginx | https://ingress.inenp.werschlan.at |
+
 ## Repository layout
 
 ```text

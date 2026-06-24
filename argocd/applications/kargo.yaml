@@ -24,12 +24,32 @@ spec:
       releaseName: kargo
       values: |
         api:
+          # Public host for the Kargo UI/API. Used for the Ingress, the issued
+          # certificate, and Kargo's own OIDC issuer/callback URLs.
+          host: kargo.inenp.werschlan.at
           # Admin password hash + token signing key come from a pre-created
           # Secret (see header), never from Git.
           secret:
             name: kargo-api
           service:
             type: ClusterIP
+          # TLS is terminated at the nginx Ingress (letsencrypt-prod), so the API
+          # server itself serves plain HTTP upstream.
+          tls:
+            enabled: false
+          # Stable HTTPS link instead of `kubectl port-forward`. cert-manager
+          # (letsencrypt-prod) fills the kargo-api-ingress-cert secret; external-dns
+          # creates the DNS record — same pattern as the tenant frontends.
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-prod
+              external-dns.alpha.kubernetes.io/hostname: kargo.inenp.werschlan.at
+            tls:
+              enabled: true
+              selfSignedCert: false
+              secretName: kargo-api-ingress-cert
         controller:
           replicas: 1
 
