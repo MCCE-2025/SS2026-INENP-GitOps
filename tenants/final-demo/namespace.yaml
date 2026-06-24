@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: final-demo
+  labels:
+    tenant: final-demo
+    environment: dev
+  annotations:
+    # Create the namespace and quota before the tenant workloads.
+    argocd.argoproj.io/sync-wave: "-1"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: final-demo-quota
+  namespace: final-demo
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    limits.cpu: "4"
+    limits.memory: 8Gi
