@@ -1,0 +1,35 @@
+replicaCount: 1
+
+image:
+  repository: europe-west3-docker.pkg.dev/sonorous-stone-498307-u2/weather-app-backend/weather-app-backend
+  # tag comes from tenants/versions-backend.yaml (centralized)
+
+serviceAccount:
+  annotations:
+    iam.gke.io/gcp-service-account: weather-app-backend@sonorous-stone-498307-u2.iam.gserviceaccount.com
+
+apiKeys:
+  useExistingSecret: true
+  existingSecretName: api-keys
+  existingSecretKey: avwx-api-key
+
+database:
+  enabled: true
+  schema: final_demo
+  credentialsSecretName: cloud-sql-credentials
+  instanceConnectionName: sonorous-stone-498307-u2:europe-west3:weather-app-db
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 384Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi

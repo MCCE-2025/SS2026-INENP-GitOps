@@ -1,0 +1,8 @@
+# Documents the PostgreSQL schema this tenant would use when a backend is deployed.
+# See platform/crossplane/schema-multitenancy.yaml for the full convention.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: database-schema
+data:
+  schema: final_demo
