@@ -1,0 +1,54 @@
+# Network isolation for this tenant. Enforced by GKE Dataplane V2 (Cilium).
+#
+# Model: default-deny INGRESS into the tenant, then allow only what the app needs.
+# Egress is left permissive (DNS + same namespace + internet) so the backend can
+# reach Cloud SQL (via the Auth Proxy to the instance's public IP) and the
+# external weather APIs, and so Argo/your platform are never affected.
+#
+# Cross-tenant isolation is enforced on the INGRESS side: even if a pod in another
+# tenant tries to reach this tenant, this default-deny + same-namespace-only rule
+# drops it. Only ingress-nginx (the shared ingress controller) and pods within
+# this same namespace may connect in.
+#
+# IMPORTANT: this policy applies ONLY to the tenant namespace it lives in. System
+# namespaces (argocd, openbao, kyverno, cert-manager, external-dns,
+# crossplane-system, dynatrace, kargo, ingress-nginx, kube-system) have NO
+# NetworkPolicy and remain fully open.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: staging
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress: []
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: staging
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-nginx
+  namespace: staging
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx

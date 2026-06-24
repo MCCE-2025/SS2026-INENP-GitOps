@@ -1,0 +1,59 @@
+# Network isolation for this tenant. Enforced by GKE Dataplane V2 (Cilium).
+#
+# Model: default-deny INGRESS into the tenant, then allow only what the app needs.
+# Egress is left permissive (DNS + same namespace + internet) so the backend can
+# reach Cloud SQL (via the Auth Proxy to the instance's public IP) and the
+# external weather APIs, and so Argo/your platform are never affected.
+#
+# Cross-tenant isolation is enforced on the INGRESS side: even if a pod in another
+# tenant tries to reach this tenant, this default-deny + same-namespace-only rule
+# drops it. Only ingress-nginx (the shared ingress controller) and pods within
+# this same namespace may connect in.
+#
+# IMPORTANT: this policy applies ONLY to the tenant namespace it lives in. System
+# namespaces (argocd, openbao, kyverno, cert-manager, external-dns,
+# crossplane-system, dynatrace, kargo, ingress-nginx, kube-system) have NO
+# NetworkPolicy and remain fully open.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: tenant-a
+spec:
+  # Empty podSelector = all pods in this namespace.
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  # No ingress rules below = deny all ingress (overridden by allow-* policies).
+  ingress: []
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: tenant-a
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    # Pods in this same namespace may talk to each other (frontend -> backend).
+    - from:
+        - podSelector: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-nginx
+  namespace: tenant-a
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    # The shared ingress controller must reach the frontend/backend so external
+    # users can use the app over the tenant's hostname.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
