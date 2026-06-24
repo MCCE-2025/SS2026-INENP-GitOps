@@ -1,0 +1,38 @@
+# Dynatrace Operator — installs and manages OneAgent + ActiveGate from the
+# DynaKube custom resource. The OCI Helm chart lives on Dynatrace's public ECR.
+#
+# Tokens are NOT in Git: they are stored in GCP Secret Manager and synced into the
+# dynatrace namespace as the "dynakube" Secret by ESO (see IaC dynatrace.tf). The
+# DynaKube CR itself is rendered by Terraform (its apiUrl comes from a TF var).
+#
+# To activate Dynatrace you only need to: register, generate the API + data-ingest
+# tokens, push them into Secret Manager, and set TF_VAR_dynatrace_api_url — then
+# `terraform apply`. The operator (this app) does the rest automatically.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dynatrace-operator
+  namespace: argocd
+spec:
+  project: platform
+
+  source:
+    repoURL: public.ecr.aws/dynatrace
+    chart: dynatrace-operator
+    targetRevision: 1.9.0
+    helm:
+      releaseName: dynatrace-operator
+      values: |
+        installCRD: true
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dynatrace
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
