@@ -6,14 +6,13 @@
 # apiUrl is your Dynatrace environment URL (NOT a secret) — set it below.
 # Tokens are NOT here: they come from the ESO-managed "dynakube" Secret created by
 # Terraform (IaC dynatrace.tf), referenced via spec.tokens.
-apiVersion: dynatrace.com/v1beta3
+apiVersion: dynatrace.com/v1beta4
 kind: DynaKube
 metadata:
   name: dynakube
   namespace: dynatrace
 spec:
-  # TODO: replace with your environment API URL, e.g.
-  # https://<env-id>.live.dynatrace.com/api  (or your Managed/ActiveGate URL).
+  # Your Dynatrace environment API URL (note the trailing /api). Not a secret.
   apiUrl: https://iga77291.live.dynatrace.com/api
   tokens: dynakube
   oneAgent:
