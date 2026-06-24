@@ -1,0 +1,46 @@
+# Kargo — multi-stage code/artifact promotion tool (complements Argo CD).
+# Installed from the official OCI Helm chart on GHCR. cert-manager (already on the
+# platform) provides the webhook certificates Kargo needs.
+#
+# Secrets note: the admin password hash and token signing key are NOT in Git.
+# They are generated in Terraform, stored in GCP Secret Manager, and synced into
+# the kargo namespace as the Secret "kargo-api" by ESO (see IaC kargo-secret.tf).
+# No manual `kubectl create secret` is needed. The chart reads it via
+# api.secret.name below. (Get the admin UI password with:
+# `terraform output -raw kargo_admin_password`.)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kargo
+  namespace: argocd
+spec:
+  project: platform
+
+  source:
+    repoURL: ghcr.io/akuity/kargo-charts
+    chart: kargo
+    targetRevision: 1.10.7
+    helm:
+      releaseName: kargo
+      values: |
+        api:
+          # Admin password hash + token signing key come from a pre-created
+          # Secret (see header), never from Git.
+          secret:
+            name: kargo-api
+          service:
+            type: ClusterIP
+        controller:
+          replicas: 1
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kargo
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

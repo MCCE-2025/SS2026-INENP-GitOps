@@ -1,0 +1,52 @@
+# Require liveness and readiness probes on every container.
+# Audit only — reports violations, never blocks a deploy.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-probes
+  annotations:
+    policies.kyverno.io/title: Require Liveness and Readiness Probes
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Containers should define liveness and readiness probes so Kubernetes can
+      restart unhealthy pods and keep traffic away from not-ready ones.
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+    - name: validate-probes
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - argocd
+                - crossplane-system
+                - kyverno
+                - cert-manager
+                - ingress-nginx
+                - external-dns
+                - external-secrets
+                - kargo
+                - openbao
+      validate:
+        message: "Every container should define both livenessProbe and readinessProbe."
+        foreach:
+          - list: request.object.spec.containers
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.livenessProbe || '' }}"
+                    operator: Equals
+                    value: ""
+                  - key: "{{ element.readinessProbe || '' }}"
+                    operator: Equals
+                    value: ""

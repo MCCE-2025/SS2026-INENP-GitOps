@@ -1,0 +1,32 @@
+# Kyverno cluster policies. Kept SEPARATE from the kyverno controller install so
+# the policies can be added/changed without touching the controller.
+#
+# Safety: every policy is validationFailureAction: Audit — it only REPORTS
+# violations (PolicyReports), it never blocks/denies a deploy. System and platform
+# namespaces are excluded as a second layer of safety. Switch a policy to Enforce
+# later, one at a time, once the reports show nothing important breaks.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kyverno-policies
+  namespace: argocd
+  annotations:
+    # After the kyverno controller (and its CRDs) are installed.
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  project: platform
+  source:
+    repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
+    targetRevision: HEAD
+    path: platform/kyverno-policies
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kyverno
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      # Policies reference Kyverno CRDs that exist only after the controller is up.
+      - SkipDryRunOnMissingResource=true
