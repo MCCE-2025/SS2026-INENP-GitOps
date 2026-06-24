@@ -3,4 +3,4 @@
 # it (override = backend-values.yaml with its own image.tag, e.g. staging).
 # Versioned independently from the frontend (tenants/versions-frontend.yaml).
 image:
-  tag: "v1.9.0"
+  tag: "v1.10.0"
