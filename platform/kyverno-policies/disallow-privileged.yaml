@@ -74,6 +74,9 @@ spec:
         deny:
           conditions:
             any:
-              - key: "{{ request.object.spec.volumes[?hostPath] | length(@) || `0` }}"
+              # Default volumes to an empty array first; pods without any volumes
+              # have spec.volumes = null, and filtering null ([?hostPath]) throws a
+              # JMESPath "Invalid type for: <nil>" error instead of evaluating to 0.
+              - key: "{{ (request.object.spec.volumes || `[]`)[?hostPath] | length(@) }}"
                 operator: GreaterThan
                 value: 0
