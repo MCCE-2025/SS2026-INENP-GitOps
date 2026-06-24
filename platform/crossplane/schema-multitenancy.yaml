@@ -22,3 +22,4 @@ data:
   defaultSchema: public
   tenantSchemaPattern: "tenant_<tenant-folder-with-underscores>"
   tenant-a-schema: tenant_a
+  test-schema: test

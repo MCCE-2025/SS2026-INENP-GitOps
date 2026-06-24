@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: europe-west3-docker.pkg.dev/sonorous-stone-498307-u2/weather-app-frontend/weather-app-frontend
-  # tag comes from tenants/versions.yaml (centralized)
+  # tag comes from tenants/versions-frontend.yaml (centralized)
 
 service:
   type: ClusterIP
@@ -25,9 +25,9 @@ ingress:
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    external-dns.alpha.kubernetes.io/hostname: tenant-z.inenp.werschlan.at
+    external-dns.alpha.kubernetes.io/hostname: test.inenp.werschlan.at
   hosts:
-    - host: tenant-z.inenp.werschlan.at
+    - host: test.inenp.werschlan.at
       paths:
         - path: /
           pathType: Prefix
@@ -37,6 +37,6 @@ ingress:
       serviceName: weather-app-backend
       servicePort: 8080
   tls:
-    - secretName: tenant-z-frontend-tls
+    - secretName: test-frontend-tls
       hosts:
-        - tenant-z.inenp.werschlan.at
+        - test.inenp.werschlan.at
