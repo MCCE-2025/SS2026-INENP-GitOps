@@ -10,7 +10,11 @@ metadata:
   namespace: tenant-z
   annotations:
     crossplane.io/external-name: tenant_z
-    argocd.argoproj.io/sync-wave: "4"
+    # Must run BEFORE the backend Deployment (wave 0): Crossplane writes the
+    # generated password into cloud-sql-credentials, which the backend mounts.
+    # A later wave would deadlock (Argo waits for the Deployment to be healthy
+    # before applying a higher wave, but the Deployment needs this secret first).
+    argocd.argoproj.io/sync-wave: "-1"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   forProvider:
