@@ -24,6 +24,14 @@ spec:
       releaseName: kargo
       values: |
         api:
+          # Tiny resources — Kargo is not used actively (API idles at ~1m / 27Mi).
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
           # Public host for the Kargo UI/API. Used for the Ingress, the issued
           # certificate, and Kargo's own OIDC issuer/callback URLs.
           host: kargo.inenp.werschlan.at
@@ -52,6 +60,49 @@ spec:
               secretName: kargo-api-ingress-cert
         controller:
           replicas: 1
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+        # Tiny resources for the remaining components. Kargo is not used actively;
+        # all components idle at 1-2m CPU / ~20Mi. Setting explicit requests/limits
+        # makes scheduling predictable and satisfies the Kyverno requests/limits
+        # policy (was BestEffort QoS with nothing set).
+        managementController:
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+        webhooksServer:
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+        externalWebhooksServer:
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+        garbageCollector:
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
 
   destination:
     server: https://kubernetes.default.svc

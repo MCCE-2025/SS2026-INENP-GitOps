@@ -1,1 +1,20 @@
 replicaCount: 1
+
+# Right-sized requests: Crossplane core idles at ~7-10m CPU and the RBAC manager
+# at ~3m, far below the chart defaults (100m each). Requests are lowered to free
+# reserved node capacity; limits stay generous (core RAM stays at 1Gi since the
+# core can use ~180Mi+ under reconcile load).
+resourcesCrossplane:
+  requests:
+    cpu: 25m
+    memory: 192Mi
+  limits:
+    cpu: 500m
+    memory: 1024Mi
+resourcesRBACManager:
+  requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 512Mi
