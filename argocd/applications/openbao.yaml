@@ -65,13 +65,17 @@ spec:
           dataStorage:
             enabled: true
             size: 2Gi
+          # Sized down: OpenBao idles at ~58m CPU / ~21Mi RAM and is not used
+          # actively yet, so requests reserve little node capacity. The CPU limit
+          # still allows bursts (e.g. unseal); raise these if it starts handling
+          # real secret traffic.
           resources:
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 25m
+              memory: 48Mi
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 250m
+              memory: 128Mi
           service:
             type: ClusterIP
         # The Agent Injector is optional and adds a mutating webhook; keep it off
