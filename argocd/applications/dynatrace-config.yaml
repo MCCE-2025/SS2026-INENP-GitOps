@@ -15,8 +15,6 @@ spec:
     repoURL: https://github.com/MCCE-2025/SS2026-INENP-GitOps
     targetRevision: HEAD
     path: platform/dynatrace
-    directory:
-      recurse: false
   destination:
     server: https://kubernetes.default.svc
     namespace: dynatrace
