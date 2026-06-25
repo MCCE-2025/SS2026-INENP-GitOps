@@ -5,7 +5,7 @@ image:
   # SPECIAL TENANT: staging pins its OWN frontend version here, independent of
   # the centralized tenants/versions.yaml. Because this file is listed AFTER
   # versions.yaml in the ApplicationSet, this tag wins.
-  tag: "v1.8.0"
+  tag: "v1.9.0"
 
 service:
   type: ClusterIP
@@ -22,6 +22,11 @@ resources:
 runtimeConfig:
   enabled: true
   backendApiUrl: /api
+  metarApiUrl: https://avwx.rest/api/metar/{icao}
+  apiKeys:
+    useExistingSecret: true
+    existingSecretName: api-keys
+    existingSecretKey: avwx-api-key
 
 ingress:
   enabled: true
